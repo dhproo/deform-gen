@@ -1402,6 +1402,32 @@
       return exportCanvas;
     }
 
+    function canvasToBlob(canvas) {
+      return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    }
+
+    async function saveBlob(blob, filename) {
+      const file = new File([blob], filename, { type: blob.type || 'application/octet-stream' });
+      const ua = navigator.userAgent || '';
+      const isTouchApple = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isMobile = isTouchApple || /Android|Mobile/i.test(ua);
+      if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename });
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = url;
+      if (isMobile) link.target = '_blank';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      setStatus(isMobile ? '저장이 안 보이면 새로 열린 화면에서 공유/저장을 선택하세요.' : '파일 저장을 시작했습니다.');
+    }
+
     function renderPattern() {
       el.gridWValue.textContent = el.gridW.value;
       el.gridHValue.textContent = el.gridH.value;
@@ -1435,11 +1461,10 @@
         : `${settings.w} x ${settings.h} / ${settings.w * settings.h}개 / ${state.palette.filter(x => x.count).length}색${settings.mode === 'pixelBlocks' ? ' / 픽셀 후 매칭' : ''}`;
     }
 
-    function downloadCanvas() {
-      const link = document.createElement('a');
-      link.download = `${state.imageName}-디폼블럭-${el.gridW.value}x${el.gridH.value}.png`;
-      link.href = buildExportCanvas().toDataURL('image/png');
-      link.click();
+    async function downloadCanvas() {
+      const filename = `${state.imageName}-디폼블럭-${el.gridW.value}x${el.gridH.value}.png`;
+      const blob = await canvasToBlob(buildExportCanvas());
+      await saveBlob(blob, filename);
     }
 
     function downloadCsv() {
@@ -1463,11 +1488,7 @@
         }
         const csv = '\ufeff' + lines.map(row => row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-        const link = document.createElement('a');
-        link.download = `${state.imageName}-픽셀화-도안.csv`;
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        URL.revokeObjectURL(link.href);
+        saveBlob(blob, `${state.imageName}-픽셀화-도안.csv`);
         return;
       }
       const lines = [
@@ -1492,11 +1513,7 @@
 
       const csv = '\ufeff' + lines.map(row => row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-      const link = document.createElement('a');
-      link.download = `${state.imageName}-수량표.csv`;
-      link.href = URL.createObjectURL(blob);
-      link.click();
-      URL.revokeObjectURL(link.href);
+      saveBlob(blob, `${state.imageName}-수량표.csv`);
     }
 
     el.fileInput.addEventListener('change', event => loadFile(event.target.files[0]));
