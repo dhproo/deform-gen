@@ -1,0 +1,1595 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>디폼블럭 도안 메이커</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --panel: #ffffff;
+      --ink: #20242c;
+      --muted: #687386;
+      --line: #d8dde6;
+      --line-dark: #aeb6c4;
+      --accent: #ff0000;
+      --accent-dark: #cc0000;
+      --blue: #2563eb;
+      --green: #16875d;
+      --yellow: #f2b705;
+      --shadow: 0 10px 28px rgba(30, 36, 48, .11);
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      color: var(--ink);
+      font: 13px "Malgun Gothic", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+      background: var(--bg);
+    }
+    button, input, select { font: inherit; }
+    button {
+      height: 34px;
+      border: 1px solid var(--line-dark);
+      border-radius: 6px;
+      padding: 0 12px;
+      color: #273042;
+      background: #fff;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--blue); }
+    button.primary {
+      border-color: var(--accent);
+      color: #fff;
+      background: var(--accent);
+      font-weight: 700;
+    }
+    button.primary:hover { background: var(--accent-dark); }
+    button.icon {
+      width: 34px;
+      padding: 0;
+      font-weight: 800;
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 52px 1fr 28px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 18px;
+      border-bottom: 1px solid #cfd5df;
+      background: #fff;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 250px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px;
+    }
+    .brand-mark i {
+      border: 1px solid #0000001f;
+      border-radius: 3px;
+    }
+    .brand-mark i:nth-child(1) { background: var(--accent); }
+    .brand-mark i:nth-child(2) { background: var(--yellow); }
+    .brand-mark i:nth-child(3) { background: var(--blue); }
+    .brand-mark i:nth-child(4) { background: var(--green); }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .file-label {
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 0 13px;
+      color: #fff;
+      background: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .file-label input { display: none; }
+
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(260px, 292px) minmax(0, 1fr) minmax(260px, 318px);
+    }
+    aside, .canvas-area {
+      min-height: 0;
+      overflow: auto;
+    }
+    aside {
+      background: var(--panel);
+    }
+    .left {
+      border-right: 1px solid var(--line);
+      padding: 16px;
+    }
+    .right {
+      border-left: 1px solid var(--line);
+      padding: 14px;
+    }
+    .section {
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e5e8ee;
+    }
+    .section:last-child {
+      border-bottom: 0;
+      margin-bottom: 0;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+    .field {
+      margin-bottom: 12px;
+    }
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      color: #4f5969;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .field small {
+      color: var(--muted);
+      font-weight: 400;
+    }
+    .field input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+    .field input[type="number"], .field select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid var(--line-dark);
+      border-radius: 5px;
+      padding: 0 9px;
+      background: #fff;
+    }
+    .field input[type="color"] {
+      width: 44px;
+      height: 32px;
+      border: 1px solid var(--line-dark);
+      border-radius: 5px;
+      padding: 2px;
+      background: #fff;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .checkline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      color: #3f4857;
+      font-weight: 700;
+    }
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line-dark);
+      border-radius: 7px;
+      background: #f8f9fb;
+    }
+    .segmented button {
+      height: 28px;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+    }
+    .segmented button.active {
+      color: #fff;
+      background: #303744;
+    }
+    .segmented.two {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .segmented.three {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .dropzone {
+      display: grid;
+      place-items: center;
+      min-height: 158px;
+      border: 2px dashed #b8c1cf;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      color: #627087;
+      background: #fafbfc;
+    }
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: #fff4f0;
+    }
+    .source-preview {
+      display: none;
+      width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f1f3f6;
+    }
+    .source-preview.show { display: block; }
+    .crop-editor {
+      display: none;
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #f1f3f6;
+      touch-action: none;
+    }
+    .crop-editor.show { display: block; }
+    .crop-editor img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 240px;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+    .crop-box {
+      position: absolute;
+      border: 2px solid #fff;
+      outline: 9999px solid rgba(17, 24, 39, .42);
+      box-shadow: 0 0 0 1px var(--accent), inset 0 0 0 1px var(--accent);
+      cursor: move;
+      touch-action: none;
+    }
+    .crop-box::before, .crop-box::after {
+      content: "";
+      position: absolute;
+      right: -15px;
+      bottom: -15px;
+      width: 30px;
+      height: 30px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .crop-toolbar {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .crop-toolbar.show { display: grid; }
+    .canvas-area {
+      padding: 20px;
+      min-width: 0;
+      overflow-x: hidden;
+      background:
+        linear-gradient(45deg, #e8ebf0 25%, transparent 25%),
+        linear-gradient(-45deg, #e8ebf0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #e8ebf0 75%),
+        linear-gradient(-45deg, transparent 75%, #e8ebf0 75%);
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      background-size: 20px 20px;
+    }
+    .stage-shell {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 18px;
+      border: 1px solid #d2d7e1;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .stage-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 12px;
+    }
+    .stage-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .stage-meta {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .pattern-wrap {
+      width: 100%;
+      max-width: 100%;
+      max-height: calc(100vh - 166px);
+      overflow: auto;
+      border: 1px solid var(--line-dark);
+      background: #fff;
+    }
+    canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+    }
+    .empty {
+      width: min(620px, 100%);
+      height: 620px;
+      display: grid;
+      place-items: center;
+      color: #697589;
+      text-align: center;
+      background: #fbfcfd;
+    }
+    .empty b {
+      display: block;
+      margin-bottom: 7px;
+      color: #333b49;
+      font-size: 15px;
+    }
+    .palette-list {
+      display: grid;
+      gap: 8px;
+    }
+    .palette-item {
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      align-items: center;
+      gap: 9px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+    }
+    .swatch {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #0000002b;
+      border-radius: 5px;
+    }
+    .color-name {
+      min-width: 0;
+      font-weight: 800;
+    }
+    .color-name span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+    .count {
+      min-width: 42px;
+      text-align: right;
+      font-weight: 800;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .summary div {
+      padding: 10px 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fafbfc;
+    }
+    .summary b {
+      display: block;
+      margin-top: 3px;
+      font-size: 16px;
+    }
+    .help {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 12px;
+    }
+    .statusbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      border-top: 1px solid #cfd5df;
+      color: #647086;
+      background: #fff;
+      font-size: 12px;
+    }
+    .statusbar span:last-child { margin-left: auto; }
+    .print-page { display: none; }
+
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      body { height: auto; min-width: 0; overflow: visible; background: #fff; }
+      .app { display: none; }
+      .print-page {
+        display: block;
+        width: 190mm;
+        min-height: 277mm;
+        color: #111827;
+        font: 9pt "Malgun Gothic", Arial, sans-serif;
+      }
+      .print-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 10mm;
+        margin-bottom: 4mm;
+        border-bottom: .3mm solid #111827;
+        padding-bottom: 2mm;
+      }
+      .print-head h1 {
+        margin: 0;
+        font-size: 15pt;
+      }
+      .print-meta {
+        text-align: right;
+        color: #4b5563;
+        font-size: 8pt;
+        line-height: 1.5;
+      }
+      .print-pattern {
+        width: 100%;
+        margin-bottom: 5mm;
+        text-align: center;
+      }
+      .print-pattern img {
+        max-width: 188mm;
+        max-height: 176mm;
+        object-fit: contain;
+        border: .25mm solid #9ca3af;
+      }
+      .print-section-title {
+        margin: 0 0 2mm;
+        font-size: 10pt;
+      }
+      .print-palette {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.6mm 3mm;
+      }
+      .print-color {
+        display: grid;
+        grid-template-columns: 7mm 1fr 12mm;
+        align-items: center;
+        gap: 1.5mm;
+        border: .2mm solid #d1d5db;
+        padding: 1.2mm;
+        break-inside: avoid;
+      }
+      .print-swatch {
+        width: 7mm;
+        height: 7mm;
+        border: .2mm solid #6b7280;
+      }
+      .print-color b {
+        display: block;
+        font-size: 8.5pt;
+      }
+      .print-color span {
+        display: block;
+        color: #4b5563;
+        font-size: 7pt;
+      }
+      .print-count {
+        text-align: right;
+        font-weight: 800;
+      }
+    }
+    @media (max-width: 1180px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        overflow: auto;
+      }
+      .app {
+        min-height: 100vh;
+        height: auto;
+        grid-template-rows: auto 1fr auto;
+      }
+      .topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px 12px;
+      }
+      .brand {
+        min-width: 0;
+      }
+      .top-actions {
+        width: 100%;
+        margin-left: 0;
+        flex-wrap: wrap;
+      }
+      .workspace {
+        grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
+        grid-template-areas:
+          "left canvas"
+          "right right";
+      }
+      .left { grid-area: left; }
+      .canvas-area { grid-area: canvas; }
+      .right { grid-area: right; border-left: 0; border-top: 1px solid var(--line); }
+      .stage-shell {
+        min-width: 0;
+        width: 100%;
+      }
+      .pattern-wrap {
+        max-width: 100%;
+      }
+      .empty {
+        width: 100%;
+        max-width: 620px;
+      }
+    }
+    @media (max-width: 900px) {
+      .workspace {
+        display: block;
+      }
+      aside, .canvas-area {
+        overflow: visible;
+      }
+      body {
+        overflow-x: hidden;
+      }
+      .left, .right {
+        border: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .canvas-area {
+        padding: 10px;
+      }
+      .pattern-wrap {
+        max-width: 100%;
+        max-height: none;
+        overflow-x: hidden;
+      }
+      .stage-head {
+        display: block;
+      }
+      .stage-meta {
+        margin-top: 4px;
+        white-space: normal;
+      }
+      .empty {
+        height: 320px;
+      }
+      .segmented.three {
+        grid-template-columns: 1fr;
+      }
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        디폼블럭 도안 메이커 v2
+      </div>
+      <div class="top-actions">
+        <label class="file-label">사진 불러오기<input id="fileInput" type="file" accept="image/*"></label>
+        <button id="downloadPng" disabled>PNG 저장</button>
+        <button id="downloadCsv" disabled>수량표 CSV</button>
+        <button id="printBtn" disabled>인쇄</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="left">
+        <section class="section">
+          <h2>사진</h2>
+          <div id="dropzone" class="dropzone">
+            <div>
+              <b>사진을 여기에 끌어오거나 상단 버튼을 누르세요.</b>
+              jpg, png, webp 파일을 사용할 수 있습니다.
+            </div>
+          </div>
+          <img id="sourcePreview" class="source-preview" alt="원본 미리보기">
+          <div id="cropEditor" class="crop-editor">
+            <img id="cropImage" alt="크롭 미리보기">
+            <div id="cropBox" class="crop-box" title="드래그해서 crop 영역을 조정"></div>
+          </div>
+          <div id="cropToolbar" class="crop-toolbar">
+            <button id="cropApply" type="button" class="primary">크롭 적용</button>
+            <button id="cropReset" type="button">전체 선택</button>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>도안 크기</h2>
+          <div class="field">
+            <label>프리셋</label>
+            <select id="sizePreset">
+              <option value="custom">직접 입력</option>
+              <option value="30" selected>30 x 30</option>
+              <option value="40">40 x 40</option>
+              <option value="50">50 x 50</option>
+              <option value="60">60 x 60</option>
+              <option value="70">70 x 70</option>
+              <option value="80">80 x 80</option>
+              <option value="90">90 x 90</option>
+              <option value="100">100 x 100</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>가로 입력</label>
+              <input id="gridWInput" type="number" min="1" max="200" value="30">
+            </div>
+            <div class="field">
+              <label>세로 입력</label>
+              <input id="gridHInput" type="number" min="1" max="200" value="30">
+            </div>
+          </div>
+          <div class="field">
+            <label>가로 칸 <small><span id="gridWValue">30</span>칸</small></label>
+            <input id="gridW" type="range" min="1" max="200" value="30">
+          </div>
+          <div class="field">
+            <label>세로 칸 <small><span id="gridHValue">30</span>칸</small></label>
+            <input id="gridH" type="range" min="1" max="200" value="30">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>샘플링</h2>
+          <div class="field">
+            <label>도안 방식</label>
+            <div class="segmented three" id="patternMode">
+              <button data-mode="blocks">디폼 색상</button>
+              <button data-mode="pixelBlocks" class="active">픽셀→디폼</button>
+              <button data-mode="raw">픽셀화만</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>맞춤 방식</label>
+            <div class="segmented" id="fitMode">
+              <button data-fit="cover" class="active">채우기</button>
+              <button data-fit="contain">전체</button>
+              <button data-fit="stretch">늘림</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>사용 색상 수 <small><span id="paletteValue">27</span>색</small></label>
+            <input id="paletteLimit" type="range" min="4" max="27" value="27">
+          </div>
+          <div class="field">
+            <label>색상 매칭 알고리즘</label>
+            <select id="matchAlgorithm">
+              <option value="lab" selected>Lab 색차</option>
+              <option value="hsl">HSL 색상군</option>
+              <option value="rgb">RGB 거리</option>
+            </select>
+          </div>
+          <label class="checkline"><input id="showGrid" type="checkbox" checked> 격자 표시</label>
+          <label class="checkline"><input id="showNumbers" type="checkbox"> 색상 번호 표시</label>
+          <label class="checkline"><input id="showCoords" type="checkbox" checked> 좌표 표시</label>
+        </section>
+
+        <section class="section">
+          <h2>배경</h2>
+          <div class="row">
+            <div class="field">
+              <label>빈칸 색</label>
+              <input id="bgColor" type="color" value="#ffffff">
+            </div>
+            <div class="field">
+              <label>블럭 모양</label>
+              <select id="blockShape">
+                <option value="square">사각형</option>
+                <option value="round">둥근 블럭</option>
+              </select>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="canvas-area">
+        <div class="stage-shell">
+          <div class="stage-head">
+            <h1 class="stage-title">도안 미리보기</h1>
+            <div id="stageMeta" class="stage-meta">사진을 불러오면 도안이 생성됩니다.</div>
+          </div>
+          <div class="pattern-wrap">
+            <div id="emptyState" class="empty">
+              <div>
+                <b>아직 생성된 도안이 없습니다.</b>
+                사진을 넣으면 설정한 칸 수에 맞춰 픽셀화합니다.
+              </div>
+            </div>
+            <canvas id="patternCanvas" width="640" height="640" hidden></canvas>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right">
+        <section class="section">
+          <h2>요약</h2>
+          <div class="summary">
+            <div>가로<b id="sumW">0</b></div>
+            <div>세로<b id="sumH">0</b></div>
+            <div>총 블럭<b id="sumTotal">0</b></div>
+          </div>
+          <p class="help">색상표는 실제 디폼블럭 제품 색상과 1:1 매칭이 아닙니다. 구매 전 가지고 있는 블럭 색상에 맞춰 가장 가까운 색으로 바꾸는 기준표로 쓰면 됩니다.</p>
+        </section>
+
+        <section class="section">
+          <h2>색상별 수량</h2>
+          <div id="paletteList" class="palette-list">
+            <p class="help">도안을 만들면 색상별 필요 수량이 표시됩니다.</p>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="statusbar">
+      <span id="statusText">대기 중</span>
+      <span>브라우저 안에서만 처리되며 사진은 업로드되지 않습니다.</span>
+    </footer>
+  </div>
+  <section id="printPage" class="print-page"></section>
+
+  <script>
+    const el = {
+      fileInput: document.querySelector('#fileInput'),
+      dropzone: document.querySelector('#dropzone'),
+      sourcePreview: document.querySelector('#sourcePreview'),
+      cropEditor: document.querySelector('#cropEditor'),
+      cropImage: document.querySelector('#cropImage'),
+      cropBox: document.querySelector('#cropBox'),
+      cropToolbar: document.querySelector('#cropToolbar'),
+      cropApply: document.querySelector('#cropApply'),
+      cropReset: document.querySelector('#cropReset'),
+      sizePreset: document.querySelector('#sizePreset'),
+      gridW: document.querySelector('#gridW'),
+      gridH: document.querySelector('#gridH'),
+      gridWInput: document.querySelector('#gridWInput'),
+      gridHInput: document.querySelector('#gridHInput'),
+      gridWValue: document.querySelector('#gridWValue'),
+      gridHValue: document.querySelector('#gridHValue'),
+      paletteLimit: document.querySelector('#paletteLimit'),
+      paletteValue: document.querySelector('#paletteValue'),
+      matchAlgorithm: document.querySelector('#matchAlgorithm'),
+      patternMode: document.querySelector('#patternMode'),
+      fitMode: document.querySelector('#fitMode'),
+      showGrid: document.querySelector('#showGrid'),
+      showNumbers: document.querySelector('#showNumbers'),
+      showCoords: document.querySelector('#showCoords'),
+      bgColor: document.querySelector('#bgColor'),
+      blockShape: document.querySelector('#blockShape'),
+      patternCanvas: document.querySelector('#patternCanvas'),
+      emptyState: document.querySelector('#emptyState'),
+      stageMeta: document.querySelector('#stageMeta'),
+      statusText: document.querySelector('#statusText'),
+      paletteList: document.querySelector('#paletteList'),
+      sumW: document.querySelector('#sumW'),
+      sumH: document.querySelector('#sumH'),
+      sumTotal: document.querySelector('#sumTotal'),
+      downloadPng: document.querySelector('#downloadPng'),
+      downloadCsv: document.querySelector('#downloadCsv'),
+      printBtn: document.querySelector('#printBtn'),
+      printPage: document.querySelector('#printPage')
+    };
+
+    const state = {
+      originalImage: null,
+      image: null,
+      imageName: 'pattern',
+      fit: 'cover',
+      mode: 'pixelBlocks',
+      crop: { x: 0, y: 0, w: 1, h: 1 },
+      appliedCrop: { x: 0, y: 0, w: 1, h: 1 },
+      cropCanvas: null,
+      cropDrag: null,
+      rawPixels: [],
+      pixels: [],
+      palette: []
+    };
+
+    const ctx = el.patternCanvas.getContext('2d');
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const hex = (r, g, b) => '#' + [r, g, b].map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join('');
+    const rgbFromHex = value => {
+      const clean = value.replace('#', '');
+      return [0, 2, 4].map(i => parseInt(clean.slice(i, i + 2), 16));
+    };
+    const DEFOM_COLORS = [
+      { code: '01', name: '연두색', hex: '#91e22e' },
+      { code: '02', name: '연녹색', hex: '#3feb71' },
+      { code: '03', name: '초록색', hex: '#0d904e' },
+      { code: '05', name: '민트색', hex: '#53eec7' },
+      { code: '06', name: '하늘색', hex: '#74e1f4' },
+      { code: '07', name: '연파랑색', hex: '#30bdef' },
+      { code: '08', name: '파랑색', hex: '#0b57b3' },
+      { code: '10', name: '남색', hex: '#121e3c' },
+      { code: '11', name: '베이지색', hex: '#f9bc5f' },
+      { code: '12', name: '레몬색', hex: '#efee2f' },
+      { code: '13', name: '노랑색', hex: '#faca22' },
+      { code: '14', name: '귤색', hex: '#fa8428' },
+      { code: '16', name: '보라색', hex: '#5938a2' },
+      { code: '18', name: '자주색', hex: '#ef42a6' },
+      { code: '19', name: '갈색', hex: '#6f1609' },
+      { code: '20', name: '진갈색', hex: '#50221c' },
+      { code: '21', name: '살색', hex: '#fabaa2' },
+      { code: '22', name: '주황색', hex: '#f86123' },
+      { code: '23', name: '분홍색', hex: '#fa97bc' },
+      { code: '25', name: '빨강색', hex: '#e02024' },
+      { code: '26', name: '핫핑크', hex: '#e52d6d' },
+      { code: '27', name: '회색', hex: '#636363' },
+      { code: '28', name: '진회색', hex: '#343434' },
+      { code: '29', name: '검정색', hex: '#2b2b2b' },
+      { code: '30', name: '흰색', hex: '#e6e2db' },
+      { code: '31', name: '연한살색', hex: '#f5d0af' },
+      { code: '33', name: '투명색', hex: '#dfc4d2' }
+    ].map(item => {
+      const rgb = rgbFromHex(item.hex);
+      return { ...item, rgb, hsl: rgbToHsl(rgb), lab: rgbToLab(rgb) };
+    });
+    const colorLabel = item => `${item.code} ${item.name}`;
+    const distance = (a, b) => {
+      const dr = a[0] - b[0], dg = a[1] - b[1], db = a[2] - b[2];
+      return dr * dr + dg * dg + db * db;
+    };
+    function rgbToHsl(rgb) {
+      let [r, g, b] = rgb.map(v => v / 255);
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h = 0, s = 0;
+      const l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > .5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+        else if (max === g) h = ((b - r) / d + 2) * 60;
+        else h = ((r - g) / d + 4) * 60;
+      }
+      return { h, s, l };
+    }
+    function hueDistance(a, b) {
+      const d = Math.abs(a - b);
+      return Math.min(d, 360 - d);
+    }
+    function rgbToLab(rgb) {
+      let [r, g, b] = rgb.map(v => {
+        v /= 255;
+        return v > .04045 ? ((v + .055) / 1.055) ** 2.4 : v / 12.92;
+      });
+      let x = (r * .4124 + g * .3576 + b * .1805) / .95047;
+      let y = (r * .2126 + g * .7152 + b * .0722) / 1.00000;
+      let z = (r * .0193 + g * .1192 + b * .9505) / 1.08883;
+      [x, y, z] = [x, y, z].map(v => v > .008856 ? v ** (1 / 3) : (7.787 * v) + (16 / 116));
+      return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+    }
+    function labDistance(a, b) {
+      const dl = a[0] - b[0], da = a[1] - b[1], db = a[2] - b[2];
+      return dl * dl + da * da + db * db;
+    }
+    function colorCandidates(color, palette) {
+      const hsl = rgbToHsl(color);
+      const byCode = codes => palette.filter(item => codes.includes(item.code));
+      const neutral = ['27', '28', '29', '30', '33'];
+
+      if (hsl.s < .12) return byCode([...neutral, '11', '31']);
+      if (hsl.h < 18 || hsl.h >= 345) return byCode(['19', '20', '22', '25', '26']);
+      if (hsl.h < 42) return byCode(['11', '14', '21', '22', '25', '31']);
+      if (hsl.h < 90 && color[0] > 115 && color[1] > 100 && color[2] < 120) return byCode(['11', '12', '13', '14', '21', '22', '30', '31']);
+      if (hsl.h < 78) return byCode(['11', '12', '13', '14', '21', '22', '30', '31']);
+      if (hsl.h < 165) return byCode(['01', '02', '03', '05']);
+      if (hsl.h < 195) return byCode(['05', '06', '07']);
+      if (hsl.h < 260) return byCode(['06', '07', '08', '10']);
+      if (hsl.h < 330) return byCode(['16', '18', '23', '26']);
+      return byCode(['18', '21', '23', '25', '26']);
+    }
+    function colorScore(color, target) {
+      const source = rgbToHsl(color);
+      const rgbScore = distance(color, target.rgb) * .32;
+      const hueScore = source.s > .14 && target.hsl.s > .14 ? hueDistance(source.h, target.hsl.h) ** 2 * 4 : 0;
+      const saturationScore = (source.s - target.hsl.s) ** 2 * 9000;
+      const lightnessScore = (source.l - target.hsl.l) ** 2 * 7000;
+      return rgbScore + hueScore + saturationScore + lightnessScore;
+    }
+    function matchScore(color, target, algorithm) {
+      if (algorithm === 'rgb') return distance(color, target.rgb);
+      if (algorithm === 'lab') return labDistance(rgbToLab(color), target.lab);
+      return colorScore(color, target);
+    }
+
+    function getSettings() {
+      return {
+        w: Number(el.gridW.value),
+        h: Number(el.gridH.value),
+        mode: state.mode,
+        paletteLimit: Number(el.paletteLimit.value),
+        matchAlgorithm: el.matchAlgorithm.value,
+        showGrid: el.showGrid.checked,
+        showNumbers: el.showNumbers.checked,
+        showCoords: el.showCoords.checked,
+        bgColor: el.bgColor.value,
+        blockShape: el.blockShape.value,
+        fit: state.fit
+      };
+    }
+
+    function setStatus(text) {
+      el.statusText.textContent = text;
+    }
+
+    function modeLabel(mode) {
+      if (mode === 'raw') return '픽셀화만';
+      if (mode === 'pixelBlocks') return '픽셀화 후 디폼 매칭';
+      return '디폼 색상';
+    }
+
+    function resetCrop(render = true) {
+      state.crop = { x: 0, y: 0, w: 1, h: 1 };
+      state.appliedCrop = { ...state.crop };
+      state.cropCanvas = null;
+      if (state.originalImage) state.image = state.originalImage;
+      renderCropBox();
+      if (render) renderPattern();
+    }
+
+    function applyCrop() {
+      const visual = imageRect();
+      const host = el.cropEditor.getBoundingClientRect();
+      const cropBox = el.cropBox.getBoundingClientRect();
+      const cropLeft = cropBox.left - host.left;
+      const cropTop = cropBox.top - host.top;
+      const source = state.originalImage || state.image;
+      const scaleX = source.width / visual.width;
+      const scaleY = source.height / visual.height;
+      const sx = Math.max(0, Math.round((cropLeft - visual.left) * scaleX));
+      const sy = Math.max(0, Math.round((cropTop - visual.top) * scaleY));
+      const sw = Math.max(1, Math.min(source.width - sx, Math.round(cropBox.width * scaleX)));
+      const sh = Math.max(1, Math.min(source.height - sy, Math.round(cropBox.height * scaleY)));
+      const cropCanvas = document.createElement('canvas');
+      cropCanvas.width = sw;
+      cropCanvas.height = sh;
+      cropCanvas.getContext('2d').drawImage(source, sx, sy, sw, sh, 0, 0, sw, sh);
+      state.image = cropCanvas;
+      state.appliedCrop = { x: 0, y: 0, w: 1, h: 1 };
+      state.cropCanvas = null;
+      renderPattern();
+      requestAnimationFrame(() => {
+        renderCropBox();
+        renderPattern();
+      });
+      setStatus(`크롭 이미지가 새 원본으로 적용됨: ${sw} x ${sh}px`);
+    }
+
+    function imageRect() {
+      const rect = el.cropImage.getBoundingClientRect();
+      const host = el.cropEditor.getBoundingClientRect();
+      const source = state.originalImage || state.image;
+      const imageRatio = source ? source.width / source.height : 1;
+      const boxRatio = rect.width / rect.height;
+      let width = rect.width;
+      let height = rect.height;
+      let offsetX = 0;
+      let offsetY = 0;
+      if (boxRatio > imageRatio) {
+        width = rect.height * imageRatio;
+        offsetX = (rect.width - width) / 2;
+      } else {
+        height = rect.width / imageRatio;
+        offsetY = (rect.height - height) / 2;
+      }
+      return {
+        left: rect.left - host.left + offsetX,
+        top: rect.top - host.top + offsetY,
+        width,
+        height
+      };
+    }
+
+    function renderCropBox() {
+      if (!state.image || !el.cropEditor.classList.contains('show')) return;
+      const rect = imageRect();
+      el.cropBox.style.left = `${rect.left + state.crop.x * rect.width}px`;
+      el.cropBox.style.top = `${rect.top + state.crop.y * rect.height}px`;
+      el.cropBox.style.width = `${state.crop.w * rect.width}px`;
+      el.cropBox.style.height = `${state.crop.h * rect.height}px`;
+    }
+
+    function clampGridValue(value) {
+      return clamp(Number(value) || 1, 1, 200);
+    }
+
+    function syncSizeControls(source) {
+      if (source === 'preset') {
+        const size = Number(el.sizePreset.value);
+        if (size) {
+          el.gridW.value = size;
+          el.gridH.value = size;
+          el.gridWInput.value = size;
+          el.gridHInput.value = size;
+        }
+        return;
+      }
+
+      if (source === 'range') {
+        el.gridWInput.value = el.gridW.value;
+        el.gridHInput.value = el.gridH.value;
+      } else if (source === 'input') {
+        el.gridW.value = clampGridValue(el.gridWInput.value);
+        el.gridH.value = clampGridValue(el.gridHInput.value);
+        el.gridWInput.value = el.gridW.value;
+        el.gridHInput.value = el.gridH.value;
+      }
+
+      const square = el.gridW.value === el.gridH.value;
+      const preset = square && Number(el.gridW.value) >= 30 && Number(el.gridW.value) <= 100 && Number(el.gridW.value) % 10 === 0
+        ? el.gridW.value
+        : 'custom';
+      el.sizePreset.value = preset;
+    }
+
+    function syncGridToImageRatio() {
+      if (!state.image) return;
+      let nextW = clampGridValue(el.gridW.value || 30);
+      let nextH = clampGridValue(el.gridH.value || 30);
+      if (state.image.height > state.image.width) {
+        nextH = clampGridValue(el.gridH.value || 30);
+        nextW = clamp(Math.round(nextH * state.image.width / state.image.height), 1, nextH);
+      } else {
+        nextW = clampGridValue(el.gridW.value || 30);
+        nextH = clamp(Math.round(nextW * state.image.height / state.image.width), 1, nextW);
+      }
+      el.gridW.value = nextW;
+      el.gridH.value = nextH;
+      el.gridWInput.value = nextW;
+      el.gridHInput.value = nextH;
+      el.gridWValue.textContent = nextW;
+      el.gridHValue.textContent = nextH;
+      el.sizePreset.value = nextW === nextH && nextW >= 30 && nextW <= 100 && nextW % 10 === 0 ? String(nextW) : 'custom';
+    }
+
+    function loadFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          state.originalImage = img;
+          state.image = img;
+          state.imageName = (file.name || 'pattern').replace(/\.[^.]+$/, '');
+          el.sourcePreview.src = reader.result;
+          el.cropImage.src = reader.result;
+          el.sourcePreview.classList.remove('show');
+          el.cropEditor.classList.add('show');
+          el.cropToolbar.classList.add('show');
+          el.dropzone.style.display = 'none';
+          resetCrop(false);
+          requestAnimationFrame(renderCropBox);
+          renderPattern();
+          setStatus(`${file.name} 불러오기 완료`);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function sampleImage(settings) {
+      const sampleCanvas = document.createElement('canvas');
+      sampleCanvas.width = settings.w;
+      sampleCanvas.height = settings.h;
+      const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+      sampleCtx.fillStyle = settings.bgColor;
+      sampleCtx.fillRect(0, 0, settings.w, settings.h);
+      sampleCtx.imageSmoothingEnabled = settings.mode === 'blocks';
+      sampleCtx.imageSmoothingQuality = 'high';
+
+      const imageRatio = state.image.width / state.image.height;
+      const gridRatio = settings.w / settings.h;
+      let dx = 0, dy = 0, dw = settings.w, dh = settings.h;
+      if (imageRatio > gridRatio) {
+        dh = settings.w / imageRatio;
+        dy = (settings.h - dh) / 2;
+      } else {
+        dw = settings.h * imageRatio;
+        dx = (settings.w - dw) / 2;
+      }
+      sampleCtx.drawImage(state.image, 0, 0, state.image.width, state.image.height, dx, dy, dw, dh);
+      const data = sampleCtx.getImageData(0, 0, settings.w, settings.h).data;
+      return Array.from({ length: settings.w * settings.h }, (_, i) => {
+        const p = i * 4;
+        const alpha = data[p + 3] / 255;
+        const bg = rgbFromHex(settings.bgColor);
+        return [
+          data[p] * alpha + bg[0] * (1 - alpha),
+          data[p + 1] * alpha + bg[1] * (1 - alpha),
+          data[p + 2] * alpha + bg[2] * (1 - alpha)
+        ];
+      });
+    }
+
+    function nearestColor(color, palette, algorithm) {
+      let best = palette[0], bestDistance = Infinity;
+      const candidates = algorithm === 'hsl' ? colorCandidates(color, palette) : palette;
+      (candidates.length ? candidates : palette).forEach(item => {
+        const d = matchScore(color, item, algorithm);
+        if (d < bestDistance) {
+          best = item;
+          bestDistance = d;
+        }
+      });
+      return best;
+    }
+
+    function buildPalette(samples, limit, algorithm) {
+      const usage = new Map(DEFOM_COLORS.map(item => [item.code, { ...item, count: 0 }]));
+      samples.forEach(color => {
+        const match = nearestColor(color, DEFOM_COLORS, algorithm);
+        usage.get(match.code).count += 1;
+      });
+
+      return [...usage.values()]
+        .sort((a, b) => b.count - a.count)
+        .slice(0, limit)
+        .sort((a, b) => Number(a.code) - Number(b.code))
+        .map((item, index) => ({ ...item, id: index + 1, count: 0 }));
+    }
+
+    function mapToPalette(samples, palette, algorithm) {
+      return samples.map(color => {
+        const best = nearestColor(color, palette, algorithm);
+        best.count += 1;
+        return best.id;
+      });
+    }
+
+    function drawPattern(settings) {
+      const cell = settings.showNumbers ? 22 : 18;
+      const coord = settings.showCoords ? 28 : 0;
+      const width = settings.w * cell + coord;
+      const height = settings.h * cell + coord;
+      el.patternCanvas.width = width;
+      el.patternCanvas.height = height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      if (settings.showCoords) {
+        ctx.fillStyle = '#f1f3f7';
+        ctx.fillRect(coord, 0, settings.w * cell, coord);
+        ctx.fillRect(0, coord, coord, settings.h * cell);
+        ctx.fillStyle = '#596579';
+        ctx.font = '10px Malgun Gothic, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (let x = 0; x < settings.w; x += 1) {
+          if (x % 5 === 0 || settings.w <= 32) ctx.fillText(String(x + 1), coord + x * cell + cell / 2, coord / 2);
+        }
+        for (let y = 0; y < settings.h; y += 1) {
+          if (y % 5 === 0 || settings.h <= 32) ctx.fillText(String(y + 1), coord / 2, coord + y * cell + cell / 2);
+        }
+      }
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const radius = settings.blockShape === 'round' ? Math.max(3, cell * .22) : 0;
+      for (let y = 0; y < settings.h; y += 1) {
+        for (let x = 0; x < settings.w; x += 1) {
+          const index = y * settings.w + x;
+          const id = state.pixels[index];
+          const raw = state.rawPixels[index] || [255, 255, 255];
+          const color = settings.mode === 'raw'
+            ? { rgb: raw, hex: hex(...raw) }
+            : state.palette[id - 1];
+          const px = coord + x * cell;
+          const py = coord + y * cell;
+          ctx.fillStyle = color.hex;
+          if (radius) {
+            roundRect(ctx, px + 1, py + 1, cell - 2, cell - 2, radius);
+            ctx.fill();
+          } else {
+            ctx.fillRect(px, py, cell, cell);
+          }
+          if (settings.showNumbers && settings.mode !== 'raw') {
+            const tone = color.rgb[0] * .299 + color.rgb[1] * .587 + color.rgb[2] * .114;
+            ctx.fillStyle = tone > 150 ? '#111827' : '#ffffff';
+            ctx.font = '10px Arial, sans-serif';
+            ctx.fillText(String(id), px + cell / 2, py + cell / 2);
+          }
+        }
+      }
+
+      if (settings.showGrid) {
+        ctx.strokeStyle = 'rgba(22, 28, 38, .28)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = 0; x <= settings.w; x += 1) {
+          ctx.moveTo(coord + x * cell + .5, coord);
+          ctx.lineTo(coord + x * cell + .5, coord + settings.h * cell);
+        }
+        for (let y = 0; y <= settings.h; y += 1) {
+          ctx.moveTo(coord, coord + y * cell + .5);
+          ctx.lineTo(coord + settings.w * cell, coord + y * cell + .5);
+        }
+        ctx.stroke();
+      }
+    }
+
+    function createPatternDataUrl(settings) {
+      const original = {
+        width: el.patternCanvas.width,
+        height: el.patternCanvas.height,
+        hidden: el.patternCanvas.hidden,
+        image: ctx.getImageData(0, 0, el.patternCanvas.width || 1, el.patternCanvas.height || 1)
+      };
+      drawPattern({ ...settings, showNumbers: settings.mode !== 'raw', showCoords: true, showGrid: true });
+      const url = el.patternCanvas.toDataURL('image/png');
+      el.patternCanvas.width = original.width;
+      el.patternCanvas.height = original.height;
+      if (original.width && original.height) ctx.putImageData(original.image, 0, 0);
+      el.patternCanvas.hidden = original.hidden;
+      return url;
+    }
+
+    function buildPrintPage() {
+      const settings = getSettings();
+      if (!state.image) return;
+      const usedColors = state.palette
+        .filter(item => item.count > 0)
+        .sort((a, b) => a.id - b.id);
+      const patternUrl = createPatternDataUrl(settings);
+      const paletteHtml = settings.mode === 'raw'
+        ? '<p>픽셀화만 모드입니다. 디폼블럭 색상표 매칭 없이 원본 색으로 출력합니다.</p>'
+        : `<div class="print-palette">${usedColors.map(item => `
+            <div class="print-color">
+              <span class="print-swatch" style="background:${item.hex}"></span>
+              <div><b>${item.id}. ${item.code} ${item.name}</b><span>${item.hex}</span></div>
+              <div class="print-count">${item.count.toLocaleString('ko-KR')}개</div>
+            </div>
+          `).join('')}</div>`;
+
+      el.printPage.innerHTML = `
+        <div class="print-head">
+          <h1>디폼블럭 도안</h1>
+          <div class="print-meta">
+            <div>${settings.w} x ${settings.h} / 총 ${(settings.w * settings.h).toLocaleString('ko-KR')}칸</div>
+            <div>${modeLabel(settings.mode)}${settings.mode !== 'raw' ? ` / ${el.matchAlgorithm.options[el.matchAlgorithm.selectedIndex].text}` : ''}</div>
+          </div>
+        </div>
+        <div class="print-pattern"><img src="${patternUrl}" alt="인쇄용 도안"></div>
+        <h2 class="print-section-title">색상 번호표 및 필요 수량</h2>
+        ${paletteHtml}
+      `;
+    }
+
+    function roundRect(context, x, y, w, h, r) {
+      context.beginPath();
+      context.moveTo(x + r, y);
+      context.arcTo(x + w, y, x + w, y + h, r);
+      context.arcTo(x + w, y + h, x, y + h, r);
+      context.arcTo(x, y + h, x, y, r);
+      context.arcTo(x, y, x + w, y, r);
+      context.closePath();
+    }
+
+    function renderPalette(settings) {
+      el.sumW.textContent = settings.w;
+      el.sumH.textContent = settings.h;
+      el.sumTotal.textContent = (settings.w * settings.h).toLocaleString('ko-KR');
+
+      if (settings.mode === 'raw') {
+        el.paletteList.innerHTML = '<p class="help">픽셀화만 모드입니다. 디폼블럭 색상표로 변환하지 않고 원본 이미지 색을 그대로 격자로 표시합니다.</p>';
+        return;
+      }
+
+      if (!state.palette.length) {
+        el.paletteList.innerHTML = '<p class="help">도안을 만들면 색상별 필요 수량이 표시됩니다.</p>';
+        return;
+      }
+
+      el.paletteList.innerHTML = state.palette
+        .filter(item => item.count > 0)
+        .sort((a, b) => b.count - a.count)
+        .map(item => `
+          <div class="palette-item">
+            <span class="swatch" style="background:${item.hex}"></span>
+            <div class="color-name">${item.id}. ${colorLabel(item)}<span>${item.hex}</span></div>
+            <div class="count">${item.count.toLocaleString('ko-KR')}</div>
+          </div>
+        `).join('');
+    }
+
+    function buildExportCanvas() {
+      const settings = getSettings();
+      const pattern = el.patternCanvas;
+      const colors = state.palette
+        .filter(item => item.count > 0)
+        .sort((a, b) => a.id - b.id);
+      const margin = 28;
+      const rowHeight = 34;
+      const headerHeight = 58;
+      const infoHeight = settings.mode === 'raw'
+        ? 52
+        : 42 + Math.ceil(colors.length / 2) * rowHeight;
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = Math.max(pattern.width + margin * 2, 980);
+      exportCanvas.height = headerHeight + pattern.height + infoHeight + margin * 2;
+      const out = exportCanvas.getContext('2d');
+      out.fillStyle = '#ffffff';
+      out.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+      out.fillStyle = '#111827';
+      out.font = '700 24px Malgun Gothic, Arial, sans-serif';
+      out.fillText('디폼블럭 도안', margin, 36);
+      out.font = '14px Malgun Gothic, Arial, sans-serif';
+      out.fillStyle = '#4b5563';
+      out.fillText(`${settings.w} x ${settings.h} / 총 ${(settings.w * settings.h).toLocaleString('ko-KR')}칸 / ${modeLabel(settings.mode)}`, margin, 56);
+      out.drawImage(pattern, margin, headerHeight + margin);
+
+      const tableY = headerHeight + margin + pattern.height + 30;
+      out.fillStyle = '#111827';
+      out.font = '700 18px Malgun Gothic, Arial, sans-serif';
+      out.fillText('색상 번호표 및 필요 수량', margin, tableY);
+
+      if (settings.mode === 'raw') {
+        out.font = '14px Malgun Gothic, Arial, sans-serif';
+        out.fillStyle = '#4b5563';
+        out.fillText('픽셀화만 모드입니다. 디폼블럭 색상표 매칭 없이 원본 색으로 저장했습니다.', margin, tableY + 28);
+        return exportCanvas;
+      }
+
+      const colWidth = Math.floor((exportCanvas.width - margin * 2 - 20) / 2);
+      colors.forEach((item, index) => {
+        const col = index % 2;
+        const row = Math.floor(index / 2);
+        const x = margin + col * (colWidth + 20);
+        const y = tableY + 18 + row * rowHeight;
+        out.strokeStyle = '#d1d5db';
+        out.strokeRect(x, y, colWidth, rowHeight - 6);
+        out.fillStyle = item.hex;
+        out.fillRect(x + 8, y + 7, 20, 20);
+        out.strokeStyle = '#6b7280';
+        out.strokeRect(x + 8, y + 7, 20, 20);
+        out.fillStyle = '#111827';
+        out.font = '700 13px Malgun Gothic, Arial, sans-serif';
+        out.fillText(`${item.id}. ${item.code} ${item.name}`, x + 38, y + 16);
+        out.fillStyle = '#4b5563';
+        out.font = '12px Arial, sans-serif';
+        out.fillText(`${item.hex}`, x + 38, y + 29);
+        out.fillStyle = '#111827';
+        out.font = '700 13px Malgun Gothic, Arial, sans-serif';
+        out.textAlign = 'right';
+        out.fillText(`${item.count.toLocaleString('ko-KR')}개`, x + colWidth - 10, y + 21);
+        out.textAlign = 'left';
+      });
+      return exportCanvas;
+    }
+
+    function renderPattern() {
+      el.gridWValue.textContent = el.gridW.value;
+      el.gridHValue.textContent = el.gridH.value;
+      el.paletteValue.textContent = el.paletteLimit.value;
+      const settings = getSettings();
+
+      if (!state.image) {
+        el.stageMeta.textContent = '사진을 불러오면 도안이 생성됩니다.';
+        return;
+      }
+
+      const samples = sampleImage(settings);
+      state.rawPixels = samples;
+      if (settings.mode !== 'raw') {
+        state.palette = buildPalette(samples, settings.paletteLimit, settings.matchAlgorithm);
+        state.pixels = mapToPalette(samples, state.palette, settings.matchAlgorithm);
+      } else {
+        state.palette = [];
+        state.pixels = [];
+      }
+      drawPattern(settings);
+      renderPalette(settings);
+      renderCropBox();
+      el.emptyState.hidden = true;
+      el.patternCanvas.hidden = false;
+      el.downloadPng.disabled = false;
+      el.downloadCsv.disabled = false;
+      el.printBtn.disabled = false;
+      el.stageMeta.textContent = settings.mode === 'raw'
+        ? `${settings.w} x ${settings.h} / ${settings.w * settings.h}개 / 원본 픽셀화`
+        : `${settings.w} x ${settings.h} / ${settings.w * settings.h}개 / ${state.palette.filter(x => x.count).length}색${settings.mode === 'pixelBlocks' ? ' / 픽셀 후 매칭' : ''}`;
+    }
+
+    function downloadCanvas() {
+      const link = document.createElement('a');
+      link.download = `${state.imageName}-디폼블럭-${el.gridW.value}x${el.gridH.value}.png`;
+      link.href = buildExportCanvas().toDataURL('image/png');
+      link.click();
+    }
+
+    function downloadCsv() {
+      const settings = getSettings();
+      if (settings.mode === 'raw') {
+        const lines = [
+          ['구분', '값'],
+          ['모드', modeLabel(settings.mode)],
+          ['가로 칸', settings.w],
+          ['세로 칸', settings.h],
+          ['총 칸', settings.w * settings.h],
+          [],
+          ['원본 픽셀 HEX 좌표'],
+          ['행/열', ...Array.from({ length: settings.w }, (_, i) => i + 1)]
+        ];
+        for (let y = 0; y < settings.h; y += 1) {
+          const row = state.rawPixels
+            .slice(y * settings.w, (y + 1) * settings.w)
+            .map(color => hex(...color));
+          lines.push([y + 1, ...row]);
+        }
+        const csv = '\ufeff' + lines.map(row => row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.download = `${state.imageName}-픽셀화-도안.csv`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        return;
+      }
+      const lines = [
+        ['구분', '값'],
+        ['가로 칸', settings.w],
+        ['세로 칸', settings.h],
+        ['총 블럭', settings.w * settings.h],
+        [],
+        ['도안 번호', '디폼 코드', '색상명', 'HEX', '수량']
+      ];
+      state.palette
+        .filter(item => item.count > 0)
+        .sort((a, b) => a.id - b.id)
+        .forEach(item => lines.push([item.id, item.code, item.name, item.hex, item.count]));
+
+      lines.push([]);
+      lines.push(['도안 좌표']);
+      lines.push(['행/열', ...Array.from({ length: settings.w }, (_, i) => i + 1)]);
+      for (let y = 0; y < settings.h; y += 1) {
+        lines.push([y + 1, ...state.pixels.slice(y * settings.w, (y + 1) * settings.w)]);
+      }
+
+      const csv = '\ufeff' + lines.map(row => row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const link = document.createElement('a');
+      link.download = `${state.imageName}-수량표.csv`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    el.fileInput.addEventListener('change', event => loadFile(event.target.files[0]));
+    el.dropzone.addEventListener('dragover', event => {
+      event.preventDefault();
+      el.dropzone.classList.add('dragover');
+    });
+    el.dropzone.addEventListener('dragleave', () => el.dropzone.classList.remove('dragover'));
+    el.dropzone.addEventListener('drop', event => {
+      event.preventDefault();
+      el.dropzone.classList.remove('dragover');
+      loadFile(event.dataTransfer.files[0]);
+    });
+    el.cropBox.addEventListener('pointerdown', event => {
+      if (!state.image) return;
+      event.preventDefault();
+      const box = el.cropBox.getBoundingClientRect();
+      const mode = box.right - event.clientX < 48 && box.bottom - event.clientY < 48 ? 'resize' : 'move';
+      state.cropDrag = {
+        mode,
+        sx: event.clientX,
+        sy: event.clientY,
+        crop: { ...state.crop }
+      };
+      el.cropBox.setPointerCapture(event.pointerId);
+    });
+    el.cropBox.addEventListener('pointermove', event => {
+      if (!state.cropDrag) return;
+      const rect = imageRect();
+      const dx = (event.clientX - state.cropDrag.sx) / rect.width;
+      const dy = (event.clientY - state.cropDrag.sy) / rect.height;
+      const base = state.cropDrag.crop;
+      if (state.cropDrag.mode === 'resize') {
+        state.crop.w = clamp(base.w + dx, .05, 1 - base.x);
+        state.crop.h = clamp(base.h + dy, .05, 1 - base.y);
+      } else {
+        state.crop.x = clamp(base.x + dx, 0, 1 - base.w);
+        state.crop.y = clamp(base.y + dy, 0, 1 - base.h);
+      }
+      renderCropBox();
+    });
+    el.cropBox.addEventListener('pointerup', event => {
+      if (!state.cropDrag) return;
+      state.cropDrag = null;
+      el.cropBox.releasePointerCapture(event.pointerId);
+    });
+    el.cropBox.addEventListener('pointercancel', () => {
+      state.cropDrag = null;
+      renderCropBox();
+    });
+    el.cropReset.addEventListener('click', () => resetCrop(true));
+    el.cropApply.addEventListener('click', applyCrop);
+    el.cropImage.addEventListener('load', renderCropBox);
+    window.addEventListener('resize', renderCropBox);
+
+    ['paletteLimit', 'matchAlgorithm', 'showGrid', 'showNumbers', 'showCoords', 'bgColor', 'blockShape']
+      .forEach(id => el[id].addEventListener('input', renderPattern));
+
+    el.sizePreset.addEventListener('change', () => {
+      syncSizeControls('preset');
+      renderPattern();
+    });
+    ['gridW', 'gridH'].forEach(id => el[id].addEventListener('input', () => {
+      syncSizeControls('range');
+      renderPattern();
+    }));
+    ['gridWInput', 'gridHInput'].forEach(id => el[id].addEventListener('change', () => {
+      syncSizeControls('input');
+      renderPattern();
+    }));
+    el.patternMode.addEventListener('click', event => {
+      const button = event.target.closest('button[data-mode]');
+      if (!button) return;
+      state.mode = button.dataset.mode;
+      el.patternMode.querySelectorAll('button').forEach(item => item.classList.toggle('active', item === button));
+      renderPattern();
+    });
+    el.fitMode.addEventListener('click', event => {
+      const button = event.target.closest('button[data-fit]');
+      if (!button) return;
+      state.fit = button.dataset.fit;
+      el.fitMode.querySelectorAll('button').forEach(item => item.classList.toggle('active', item === button));
+      renderPattern();
+    });
+    el.downloadPng.addEventListener('click', downloadCanvas);
+    el.downloadCsv.addEventListener('click', downloadCsv);
+    el.printBtn.addEventListener('click', () => {
+      buildPrintPage();
+      window.print();
+    });
+    window.addEventListener('beforeprint', buildPrintPage);
+
+    renderPattern();
+  </script>
+</body>
+</html>
